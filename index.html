@@ -71,24 +71,37 @@ const addButton = document.querySelector(".add-form-button");
 const nameInput = document.querySelector(".add-form-name");
 const commentInput = document.querySelector(".add-form-text");
 const commentsList = document.querySelector(".comments");
+
+function sanitize(str) {
+    return str.replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+}
+
 addButton.addEventListener("click", () => {
     const name = nameInput.value.trim();
     const text = commentInput.value.trim();
+
     if (name === "" || text === "") {
-        alert("Пожалуйста, введите имя и текст комментария");
-        return;
+        return; 
     }
+
     const now = new Date();
-    const dateString = now.toLocaleString().slice(0, -3); 
-    const oldHtml = commentsList.innerHTML;
+    
+    const dateString = now.toLocaleString('ru-RU', {
+      day:"2-digit",
+      month:"2-digit",
+      year:"2-digit",
+      hour:"2-digit",
+      minute:"2-digit",
+    }) 
+
     const newCommentHtml = `
-        <div class="comment">
+        <li class="comment">
             <div class="comment-header">
-                <div>${name}</div>
+                <div>${sanitize(name)}</div>
                 <div>${dateString}</div>
             </div>
             <div class="comment-body">
-                <div class="comment-text">${text}</div>
+                <div class="comment-text">${sanitize(text)}</div>
             </div>
             <div class="comment-footer">
                 <div class="likes">
@@ -96,11 +109,14 @@ addButton.addEventListener("click", () => {
                     <button class="like-button"></button>
                 </div>
             </div>
-        </div>`;
-    commentsList.innerHTML = oldHtml + newCommentHtml;
+        </li>`;
+
+    commentsList.insertAdjacentHTML("beforeend", newCommentHtml);
+
     nameInput.value = "";
     commentInput.value = "";
 });
+
     console.log("It works!");
   </script>
 </html>
