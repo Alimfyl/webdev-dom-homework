@@ -66,12 +66,10 @@
   <script>
     "use strict";
     // Код писать здесь
-    
-const addButton = document.querySelector(".add-form-button");
+    const addButton = document.querySelector(".add-form-button");
 const nameInput = document.querySelector(".add-form-name");
 const commentInput = document.querySelector(".add-form-text");
 const commentsList = document.querySelector(".comments");
-
 
 const comments = [
     {
@@ -90,19 +88,64 @@ const comments = [
     }
 ];
 
+// Функция защиты от XSS (теперь обрабатывает и текст для цитирования)
 function sanitize(str) {
-    return str.replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+    return str
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;');
 }
+
+// 1. Инициализация кликов на лайки
+const initLikeButtons = () => {
+    const likeButtons = document.querySelectorAll(".like-button");
+
+    for (const likeButton of likeButtons) {
+        likeButton.addEventListener("click", (event) => {
+            event.stopPropagation(); // Остановка всплытия, чтобы не срабатывал ответ на коммент
+            
+            const index = likeButton.dataset.index;
+            const comment = comments[index];
+
+            if (comment.isLiked) {
+                comment.likes--;
+            } else {
+                comment.likes++;
+            }
+            comment.isLiked = !comment.isLiked;
+
+            renderComments();
+        });
+    }
+};
+
+// 2. Инициализация кликов на сами комментарии (для ответа)
+const initCommentReply = () => {
+    const commentElements = document.querySelectorAll(".comment");
+
+    for (const commentElement of commentElements) {
+        commentElement.addEventListener("click", () => {
+            const index = commentElement.dataset.index;
+            const comment = comments[index];
+            
+            // Формируем текст ответа: цитата автора + его текст
+            const replyText = `> ${comment.text}\n\n${comment.name}, `;
+            commentInput.value = replyText;
+            commentInput.focus();
+        });
+    }
+};
 
 const renderComments = () => {
     const commentsHtml = comments.map((comment, index) => {
-        return `<li class="comment">
+        return `<li class="comment" data-index="${index}">
             <div class="comment-header">
                 <div>${sanitize(comment.name)}</div>
                 <div>${comment.date}</div>
             </div>
             <div class="comment-body">
-                <div class="comment-text">${sanitize(comment.text)}</div>
+                <div class="comment-text">
+                    ${sanitize(comment.text)}
+                </div>
             </div>
             <div class="comment-footer">
                 <div class="likes">
@@ -114,29 +157,9 @@ const renderComments = () => {
     }).join("");
 
     commentsList.innerHTML = commentsHtml;
+    
     initLikeButtons();
-};
-
-
-const initLikeButtons = () => {
-    const likeButtons = document.querySelectorAll(".like-button");
-
-    for (const likeButton of likeButtons) {
-        likeButton.addEventListener("click", () => {
-            const index = likeButton.dataset.index;
-            const comment = comments[index];
-
-            if (comment.isLiked) {
-                comment.likes--;
-                comment.isLiked = false;
-            } else {
-                comment.likes++;
-                comment.isLiked = true;
-            }
-
-            renderComments();
-        });
-    }
+    initCommentReply(); // Инициализируем обработчики ответов
 };
 
 addButton.addEventListener("click", () => {
@@ -145,8 +168,7 @@ addButton.addEventListener("click", () => {
 
     if (name === "" || text === "") return;
 
-    const now = new Date();
-    const dateString = now.toLocaleString('ru-RU', {
+    const dateString = new Date().toLocaleString('ru-RU', {
         day: "2-digit", month: "2-digit", year: "2-digit",
         hour: "2-digit", minute: "2-digit"
     }).replace(',', '');
@@ -164,7 +186,6 @@ addButton.addEventListener("click", () => {
     nameInput.value = "";
     commentInput.value = "";
 });
-
 
 renderComments();
   </script>
