@@ -21,6 +21,7 @@ const initLikeButtons = () => {
 }
 }
 export const initReplyListeners = () => {
+    const commentsList = document.querySelector(".comments");
     addButton.addEventListener("click", () => {
    const name = nameInput.value.trim();
    const text = commentInput.value.trim();
