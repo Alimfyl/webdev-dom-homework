@@ -1,4 +1,5 @@
 import { comments } from "./comments.js";
+import { initLikeListeners, initReplyListeners } from "./initListeners.js";
 
 export const renderComments = () => {
     const commentsHtml = comments.map((comment, index) => {
@@ -20,6 +21,7 @@ export const renderComments = () => {
     }).join("");
 
     commentsList.innerHTML = commentsHtml;
-    initLikeButtons();
+    initLikeListeners(renderComments);
+    initReplyListeners();
 };
 

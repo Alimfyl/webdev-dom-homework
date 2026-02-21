@@ -1,6 +1,7 @@
-export const initLikeListeners = () => {
-const initLikeButtons = () => {
-    const likeButtons = document.querySelectorAll(".like-button");
+import { comments } from "./comments.js";
+
+export const initLikeListeners = (renderComments) => {
+         const likeButtons = document.querySelectorAll(".like-button");
 
     for (const likeButton of likeButtons) {
         likeButton.addEventListener("click", () => {
@@ -18,7 +19,7 @@ const initLikeButtons = () => {
             renderComments();
         });
     }
-}
+
 }
 export const initReplyListeners = () => {
     const commentsList = document.querySelector(".comments");
