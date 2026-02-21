@@ -1,4 +1,4 @@
-
+export const commentsList = document.querySelector(".comments");
 export const comments = [
     {
         name: "Глеб Фокин",

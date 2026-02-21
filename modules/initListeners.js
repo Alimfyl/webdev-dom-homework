@@ -1,51 +1,32 @@
+
 import { comments } from "./comments.js";
 
 export const initLikeListeners = (renderComments) => {
-         const likeButtons = document.querySelectorAll(".like-button");
+    const likeButtons = document.querySelectorAll(".like-button");
 
     for (const likeButton of likeButtons) {
-        likeButton.addEventListener("click", () => {
+        likeButton.addEventListener("click", (event) => {
+            event.stopPropagation();
             const index = likeButton.dataset.index;
             const comment = comments[index];
 
-            if (comment.isLiked) {
-                comment.likes--;
-                comment.isLiked = false;
-            } else {
-                comment.likes++;
-                comment.isLiked = true;
-            }
+            comment.isLiked ? comment.likes-- : comment.likes++;
+            comment.isLiked = !comment.isLiked;
 
             renderComments();
         });
     }
+};
 
-}
 export const initReplyListeners = () => {
-    const commentsList = document.querySelector(".comments");
-    addButton.addEventListener("click", () => {
-   const name = nameInput.value.trim();
-   const text = commentInput.value.trim();
+    const commentElements = document.querySelectorAll(".comment");
+    const commentInput = document.querySelector(".add-form-text");
 
-   if (name === "" || text === "") return;
-
-   const now = new Date();
-   const dateString = now.toLocaleString('ru-RU', {
-       day: "2-digit", month: "2-digit", year: "2-digit",
-       hour: "2-digit", minute: "2-digit"
-   }).replace(',', '');
-
-   comments.push({
-       name: name,
-       date: dateString,
-       text: text,
-       likes: 0,
-       isLiked: false
-    })
-    
-    renderComments();
-
-    nameInput.value = "";
-    commentInput.value = "";
-});
-}
+    for (const commentElement of commentElements) {
+        commentElement.addEventListener("click", () => {
+            const index = commentElement.dataset.index;
+            const comment = comments[index];
+            commentInput.value = `> ${comment.text}\n\n${comment.name}, `;
+        });
+    }
+};
