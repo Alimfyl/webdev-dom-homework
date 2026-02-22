@@ -66,40 +66,127 @@
   <script>
     "use strict";
     // Код писать здесь
-const addButton = document.querySelector(".add-form-button");
+    const addButton = document.querySelector(".add-form-button");
 const nameInput = document.querySelector(".add-form-name");
 const commentInput = document.querySelector(".add-form-text");
 const commentsList = document.querySelector(".comments");
-addButton.addEventListener("click", () => {
-    const name = nameInput.value.trim();
-    const text = commentInput.value.trim();
-    if (name === "" || text === "") {
-        alert("Пожалуйста, введите имя и текст комментария");
-        return;
+
+const comments = [
+    {
+        name: "Глеб Фокин",
+        date: "12.02.22 12:18",
+        text: "Это будет первый комментарий на этой странице",
+        likes: 3,
+        isLiked: false
+    },
+    {
+        name: "Варвара Н.",
+        date: "13.02.22 19:22",
+        text: "Мне нравится как оформлена эта страница! ❤",
+        likes: 75,
+        isLiked: true
     }
-    const now = new Date();
-    const dateString = now.toLocaleString().slice(0, -3); 
-    const oldHtml = commentsList.innerHTML;
-    const newCommentHtml = `
-        <div class="comment">
+];
+
+// Функция защиты от XSS (теперь обрабатывает и текст для цитирования)
+function sanitize(str) {
+    return str
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;');
+}
+
+// 1. Инициализация кликов на лайки
+const initLikeButtons = () => {
+    const likeButtons = document.querySelectorAll(".like-button");
+
+    for (const likeButton of likeButtons) {
+        likeButton.addEventListener("click", (event) => {
+            event.stopPropagation(); // Остановка всплытия, чтобы не срабатывал ответ на коммент
+            
+            const index = likeButton.dataset.index;
+            const comment = comments[index];
+
+            if (comment.isLiked) {
+                comment.likes--;
+            } else {
+                comment.likes++;
+            }
+            comment.isLiked = !comment.isLiked;
+
+            renderComments();
+        });
+    }
+};
+
+// 2. Инициализация кликов на сами комментарии (для ответа)
+const initCommentReply = () => {
+    const commentElements = document.querySelectorAll(".comment");
+
+    for (const commentElement of commentElements) {
+        commentElement.addEventListener("click", () => {
+            const index = commentElement.dataset.index;
+            const comment = comments[index];
+            
+            // Формируем текст ответа: цитата автора + его текст
+            const replyText = `> ${comment.text}\n\n${comment.name}, `;
+            commentInput.value = replyText;
+            commentInput.focus();
+        });
+    }
+};
+
+const renderComments = () => {
+    const commentsHtml = comments.map((comment, index) => {
+        return `<li class="comment" data-index="${index}">
             <div class="comment-header">
-                <div>${name}</div>
-                <div>${dateString}</div>
+                <div>${sanitize(comment.name)}</div>
+                <div>${comment.date}</div>
             </div>
             <div class="comment-body">
-                <div class="comment-text">${text}</div>
+                <div class="comment-text">
+                    ${sanitize(comment.text)}
+                </div>
             </div>
             <div class="comment-footer">
                 <div class="likes">
-                    <span class="likes-counter">0</span>
-                    <button class="like-button"></button>
+                    <span class="likes-counter">${comment.likes}</span>
+                    <button data-index="${index}" class="like-button ${comment.isLiked ? '-active-like' : ''}"></button>
                 </div>
             </div>
-        </div>`;
-    commentsList.innerHTML = oldHtml + newCommentHtml;
+        </li>`;
+    }).join("");
+
+    commentsList.innerHTML = commentsHtml;
+    
+    initLikeButtons();
+    initCommentReply(); // Инициализируем обработчики ответов
+};
+
+addButton.addEventListener("click", () => {
+    const name = nameInput.value.trim();
+    const text = commentInput.value.trim();
+
+    if (name === "" || text === "") return;
+
+    const dateString = new Date().toLocaleString('ru-RU', {
+        day: "2-digit", month: "2-digit", year: "2-digit",
+        hour: "2-digit", minute: "2-digit"
+    }).replace(',', '');
+
+    comments.push({
+        name: name,
+        date: dateString,
+        text: text,
+        likes: 0,
+        isLiked: false
+    });
+
+    renderComments();
+
     nameInput.value = "";
     commentInput.value = "";
 });
-    console.log("It works!");
+
+renderComments();
   </script>
 </html>
