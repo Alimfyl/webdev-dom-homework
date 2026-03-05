@@ -6,10 +6,10 @@ const addButton = document.querySelector(".add-form-button");
 const nameInput = document.querySelector(".add-form-name");
 const commentInput = document.querySelector(".add-form-text");
 
-// ОДНА функция для загрузки и отрисовки
+
 const getAndRenderComments = () => {
     return fetchComments().then((data) => {
-        // Если на сервере пусто — загружаем Глеба и Варвару
+        
         if (data.comments.length === 1) {
             return Promise.all([
                 postComment("Это будет первый комментарий на этой странице", "Глеб Фокин"),
@@ -17,7 +17,7 @@ const getAndRenderComments = () => {
             ]).then(() => getAndRenderComments()); 
         }
 
-        // Преобразуем данные из API в формат приложения
+       
         const appComments = data.comments.map((comment) => {
             return {
                 name: comment.author.name,
