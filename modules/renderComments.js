@@ -24,28 +24,7 @@ export const renderComments = () => {
 
     commentsList.innerHTML = commentsHtml;
     
-    initLikeListeners(renderComments);
+   
+    initLikeListeners(renderComments); 
     initReplyListeners();
 };
-
-const addButton = document.querySelector(".add-form-button");
-const nameInput = document.querySelector(".add-form-name");
-const commentInput = document.querySelector(".add-form-text");
-
-addButton.addEventListener("click", () => {
-    if (!nameInput.value.trim() || !commentInput.value.trim()) return;
-
-    comments.push({
-        name: nameInput.value,
-        date: new Date().toLocaleString().slice(0, -3),
-        text: commentInput.value,
-        likes: 0,
-        isLiked: false
-    });
-
-    renderComments();
-    nameInput.value = "";
-    commentInput.value = "";
-});
-
-renderComments();
