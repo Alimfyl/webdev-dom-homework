@@ -1,5 +1,6 @@
 export const commentsList = document.querySelector(".comments");
-export let comments = [];
+export const comments = [];
 export const setComments = (newComments) => {
-    comments = newComments;
+    comments.splice(0, comments.length);
+    comments.push(...newComments);
 };
