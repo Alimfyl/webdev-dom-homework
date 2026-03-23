@@ -1,4 +1,4 @@
-const host = "https://wedev-api.sky.pro/api/v1/almer-ishkmyhametov-new";
+const host = "https://wedev-api.sky.pro/api/v2/almer-ishkmyhametov-new";
 
 export const fetchComments = () => {
     return fetch(host + "/comments", {
