@@ -1,10 +1,14 @@
-import { comments, commentsList } from "./comments.js";
+import { comments } from "./comments.js";
 import { initLikeListeners, initReplyListeners } from "./initListeners.js";
+import { token } from "./api.js"; 
 
 const sanitize = (str) => str.replaceAll('<', '&lt;').replaceAll('>', '&gt;');
 
 export const renderComments = () => {
-    const commentsHtml = comments.map((comment, index) => {
+    const container = document.querySelector('.container');
+
+    
+    const commentsHTML = comments.map((comment, index) => {
         return `<li class="comment" data-index="${index}">
             <div class="comment-header">
                 <div>${sanitize(comment.name)}</div>
@@ -22,9 +26,37 @@ export const renderComments = () => {
         </li>`;
     }).join("");
 
-    commentsList.innerHTML = commentsHtml;
     
-   
-    initLikeListeners(renderComments); 
+    const actionHtml = token 
+        ? `
+        <div class="add-form" id="add-form">
+            <input type="text" class="add-form-name" value="Вы авторизованы" readonly />
+            <textarea class="add-form-text" placeholder="Введите ваш комментарий" rows="4"></textarea>
+            <div class="add-form-row">
+                <button class="add-form-button">Написать</button>
+            </div>
+        </div>
+        <div id="add-loader" class="loader" style="display: none;">Комментарий добавляется...</div>`
+        : `
+        <div class="login-alert">
+            Чтобы добавить комментарий, <button class="link-button" id="login-link">авторизуйтесь</button>
+        </div>`;
+
+        
+    container.innerHTML = `
+        <ul class="comments">${commentsHTML}</ul>
+        ${actionHtml}
+    `;
+
+    
+    initLikeListeners(renderComments);
     initReplyListeners();
+
+    
+    if (!token) {
+        document.getElementById("login-link").addEventListener("click", () => {
+            
+            renderLogin(); 
+        });
+    }
 };
