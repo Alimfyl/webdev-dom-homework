@@ -1,5 +1,5 @@
 import { login, setToken, setUserName } from "./api.js";
-import { getAndRenderComments } from "../main.js"; // Функция, которая заново тянет список и рендерит его
+import { getAndRenderComments } from "../main.js";
 
 export const renderLogin = () => {
     const container = document.querySelector('.container');
