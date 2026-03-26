@@ -1,6 +1,11 @@
 const host = "https://wedev-api.sky.pro/api/v2/almer-ishkmyhametov-new";
 const authHost = "https://wedev-api.sky.pro/api/user"
 
+export let userName = null;
+export const setUserName = (newName) => {
+    userName = newName;
+}
+
 export let token = null;
 export const setToken = (newToken) => {
     token = newToken
