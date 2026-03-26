@@ -58,12 +58,15 @@ export const loginUser = (login, password) => {
 export const registration = (name, login, password) => {
     return fetch(authHost, {
         method: 'POST',
-        headers: {
-            "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, login, password })
     }).then((res) => {
-        if (res.status === 400) throw new Error("Такой пользователь уже существует");
+        if (res.status === 400) throw new Error("Такой пользователь уже существует или данные введены некорректно");
         return res.json();
+    }).then((data) => {
+        
+        setToken(data.user.token);
+        setUserName(data.user.name);
+        return data;
     });
 };
