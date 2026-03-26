@@ -1,8 +1,9 @@
-import { fetchComments, postComment, token } from "./modules/api.js";
+import { fetchComments, postComment } from "./modules/api.js";
 import { setComments } from "./modules/comments.js";
 import { renderComments } from "./modules/renderComments.js";
 
-const getAndRenderComments = () => {
+
+export const getAndRenderComments = () => {
     return fetchComments()
         .then((data) => {
             const appComments = data.comments.map((comment) => ({
@@ -10,22 +11,27 @@ const getAndRenderComments = () => {
                 date: new Date(comment.date).toLocaleString().slice(0, -3),
                 text: comment.text,
                 likes: comment.likes,
-                isLiked: false,
+                isLiked: comment.isLiked,
             }));
 
             setComments(appComments);
             renderComments(); 
             subscribeToAddEvents();
         })
-        .catch((error) => handleError(error));
+        .catch((error) => {
+            console.error(error);
+            if (error.message === "Failed to fetch") {
+                alert("Интернет упал");
+            } else {
+                alert(error.message);
+            }
+        });
 };
-
 
 const subscribeToAddEvents = () => {
     const addButton = document.querySelector(".add-form-button");
     const commentInput = document.querySelector(".add-form-text");
 
-    
     if (!addButton) return;
 
     addButton.addEventListener("click", () => {
@@ -35,7 +41,6 @@ const subscribeToAddEvents = () => {
             alert("Комментарий должен быть не короче 3 символов");
             return;
         }
-
         
         const addForm = document.querySelector(".add-form");
         const addLoader = document.getElementById("add-loader");
@@ -44,16 +49,20 @@ const subscribeToAddEvents = () => {
         addLoader.style.display = "block";
 
         postComment(trimmedText)
-            .then(() => getAndRenderComments())
             .then(() => {
-                commentInput.value = "";
+                return getAndRenderComments();
+            })
+            .then(() => {
+                
+                if (commentInput) commentInput.value = "";
             })
             .catch((error) => {
                 addForm.style.display = "flex";
                 addLoader.style.display = "none";
-                handleError(error);
+                alert(error.message);
             });
     });
 };
+
 
 getAndRenderComments();
