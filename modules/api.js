@@ -41,13 +41,16 @@ export const postComment = (text) => {
 export const loginUser = (login, password) => {
     return fetch(authHost + '/login', {
         method: 'POST',
-        headers: {
-            "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ login, password })
     }).then((res) => {
         if (res.status === 400) throw new Error("Неверный логин или пароль");
         return res.json();
+    }).then((data) => {
+        // Сохраняем данные сразу после получения
+        setToken(data.user.token);
+        setUserName(data.user.name);
+        return data;
     });
 };
 
