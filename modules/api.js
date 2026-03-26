@@ -47,7 +47,7 @@ export const loginUser = (login, password) => {
         if (res.status === 400) throw new Error("Неверный логин или пароль");
         return res.json();
     }).then((data) => {
-        // Сохраняем данные сразу после получения
+        
         setToken(data.user.token);
         setUserName(data.user.name);
         return data;
