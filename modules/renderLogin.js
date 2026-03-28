@@ -1,5 +1,6 @@
-import { login, setToken, setUserName } from "./api.js";
-import { getAndRenderComments } from "../main.js";
+import { loginUser } from "./api.js";
+import { getAndRenderComments } from "../index.js";
+import { renderRegistration } from "./renderRegistration.js"; 
 
 export const renderLogin = () => {
     const container = document.querySelector('.container');
@@ -17,33 +18,27 @@ export const renderLogin = () => {
 
     container.innerHTML = loginHtml;
 
-    const loginButton = document.getElementById("login-button");
-    const loginInput = document.getElementById("login-input");
-    const passwordInput = document.getElementById("password-input");
+    
+    document.getElementById("login-button").addEventListener("click", () => {
+        const loginInput = document.getElementById("login-input");
+        const passwordInput = document.getElementById("password-input");
 
-    loginButton.addEventListener("click", () => {
-        // Простейшая валидация
         if (!loginInput.value || !passwordInput.value) {
             alert("Введите логин и пароль");
             return;
         }
 
-        login(loginInput.value, passwordInput.value)
-            .then((res) => {
-                // Если API вернуло ошибку, выбрасываем её в catch
-                if (res.status === 400) throw new Error("Неверный логин или пароль");
-                return res.json();
-            })
-            .then((data) => {
-                // Сохраняем данные пользователя в модуле api.js
-                setToken(data.user.token);
-                setUserName(data.user.name);
-                
-                // Перенаправляем на страницу комментариев (просто вызываем их загрузку и рендер)
+        loginUser(loginInput.value, passwordInput.value)
+            .then(() => {
                 getAndRenderComments();
             })
             .catch((error) => {
                 alert(error.message);
             });
+    });
+
+
+    document.getElementById("registry-link").addEventListener("click", () => {
+        renderRegistration(); 
     });
 };

@@ -1,6 +1,7 @@
 import { comments } from "./comments.js";
 import { initLikeListeners, initReplyListeners } from "./initListeners.js";
-import { token } from "./api.js"; 
+import { token, userName } from "./api.js"; 
+import { renderLogin } from "./renderLogin.js"
 
 const sanitize = (str) => str.replaceAll('<', '&lt;').replaceAll('>', '&gt;');
 
@@ -26,11 +27,11 @@ export const renderComments = () => {
         </li>`;
     }).join("");
 
-    
     const actionHtml = token 
         ? `
         <div class="add-form" id="add-form">
-            <input type="text" class="add-form-name" value="Вы авторизованы" readonly />
+            <!-- ИЗМЕНЕНИЕ 1: Подставляем реальное userName и оставляем readonly -->
+            <input type="text" class="add-form-name" value="${userName}" readonly />
             <textarea class="add-form-text" placeholder="Введите ваш комментарий" rows="4"></textarea>
             <div class="add-form-row">
                 <button class="add-form-button">Написать</button>
@@ -42,21 +43,21 @@ export const renderComments = () => {
             Чтобы добавить комментарий, <button class="link-button" id="login-link">авторизуйтесь</button>
         </div>`;
 
-        
     container.innerHTML = `
         <ul class="comments">${commentsHTML}</ul>
         ${actionHtml}
     `;
 
-    
     initLikeListeners(renderComments);
     initReplyListeners();
 
-    
     if (!token) {
-        document.getElementById("login-link").addEventListener("click", () => {
-            
-            renderLogin(); 
-        });
+        
+        const loginLink = document.getElementById("login-link");
+        if (loginLink) {
+            loginLink.addEventListener("click", () => {
+                renderLogin(); 
+            });
+        }
     }
 };

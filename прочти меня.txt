@@ -1,0 +1,65 @@
+Чтобы всё заработало как единый механизм, проверьте три ключевых файла. Главная сложность здесь — циклическая зависимость (когда файлы импортируют друг друга), поэтому важно экспортировать функции правильно.
+1. Файл api.js
+Здесь хранятся данные о пользователе. Убедитесь, что token и userName экспортируются, чтобы другие модули их видели.
+javascript
+export let token = null;
+export let userName = null;
+
+export const setToken = (newToken) => { token = newToken; };
+export const setUserName = (newName) => { userName = newName; };
+
+// ... функции fetchComments, postComment, loginUser ...
+Используйте код с осторожностью.
+
+2. Файл renderComments.js
+Этот модуль должен уметь переключать экран на логин.
+javascript
+import { token, userName } from "./api.js";
+import { renderLogin } from "./renderLogin.js"; // ИМПОРТ ТУТ
+
+export const renderComments = () => {
+    // ... ваш код отрисовки списка ...
+    
+    // В месте, где выводится кнопка авторизации:
+    if (!token) {
+        const loginLink = document.getElementById("login-link");
+        if (loginLink) {
+            loginLink.addEventListener("click", () => {
+                renderLogin(); // ВЫЗОВ ТУТ
+            });
+        }
+    }
+};
+Используйте код с осторожностью.
+
+3. Файл renderLogin.js
+После успешного входа этот модуль должен скомандовать главному файлу «обнови список комментариев».
+javascript
+import { loginUser, setToken, setUserName } from "./api.js";
+import { getAndRenderComments } from "../main.js"; // ИМПОРТ ИЗ MAIN
+
+export const renderLogin = () => {
+    // ... отрисовка формы ...
+    
+    loginButton.addEventListener("click", () => {
+        loginUser(login, password)
+            .then((data) => {
+                setToken(data.user.token);
+                setUserName(data.user.name);
+                getAndRenderComments(); // ВОЗВРАТ В MAIN
+            });
+    });
+};
+Используйте код с осторожностью.
+
+4. Файл main.js (Точка входа)
+Здесь вы просто запускаете приложение.
+javascript
+import { getAndRenderComments } from "./getAndRenderComments.js"; // или прямо тут функция
+
+getAndRenderComments(); // Первый запуск
+Используйте код с осторожностью.
+
+На что обратить внимание:
+Если при импорте getAndRenderComments в файл логина возникает ошибка «циклической зависимости», самый простой способ её решить — убедиться, что в main.js функция getAndRenderComments помечена словом export.
+У вас уже создан файл registration или пока достаточно только входа в систему?
