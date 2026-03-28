@@ -58,13 +58,24 @@ export const loginUser = (login, password) => {
 export const registration = (name, login, password) => {
     return fetch(authHost, {
         method: 'POST',
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, login, password })
+        headers: {
+            "Content-Type": "application/json" // ОБЯЗАТЕЛЬНО
+        },
+        body: JSON.stringify({
+            login: login,    // Проверьте, нет ли тут лишних слов типа "Input"
+            name: name,      
+            password: password 
+        })
     }).then((res) => {
-        if (res.status === 400) throw new Error("Такой пользователь уже существует или данные введены некорректно");
+        if (res.status === 400) {
+            // Если вы видите это сообщение, значит данные дошли, но они "плохие"
+            throw new Error("Пользователь уже существует или данные (имя/пароль) слишком короткие");
+        }
+        if (!res.ok) {
+            throw new Error("Ошибка сервера");
+        }
         return res.json();
     }).then((data) => {
-        
         setToken(data.user.token);
         setUserName(data.user.name);
         return data;
