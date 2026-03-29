@@ -1,4 +1,4 @@
-import { loginUser } from "./api.js";
+import { loginUser, setToken, setUserName } from "./api.js"; // Добавь импорт сеттеров
 import { getAndRenderComments } from "../index.js";
 import { renderRegistration } from "./renderRegistration.js"; 
 
@@ -29,7 +29,11 @@ export const renderLogin = () => {
         }
 
         loginUser(loginInput.value, passwordInput.value)
-            .then(() => {
+            .then((responseData) => {
+                
+                setToken(responseData.user.token);
+                setUserName(responseData.user.name);
+                
                 getAndRenderComments();
             })
             .catch((error) => {

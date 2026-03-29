@@ -41,7 +41,7 @@ export const loginUser = (login, password) => {
     return fetch(authHost + '/login', {
         method: 'POST',
         headers: { 
-            "Content-Type": "application/json" // Обязательно верни это!
+            "Content-Type": "application/json"
         },
         body: JSON.stringify({ login, password })
     }).then((res) => {
@@ -55,7 +55,7 @@ export const registration = (name, login, password) => {
     return fetch(authHost, {
         method: 'POST',
         headers: { 
-            "Content-Type": "application/json" // И здесь тоже
+            "Content-Type": "application/json" 
         },
         body: JSON.stringify({ login, name, password })
     }).then((res) => {
