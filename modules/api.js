@@ -40,38 +40,28 @@ export const postComment = (text) => {
 export const loginUser = (login, password) => {
     return fetch(authHost + '/login', {
         method: 'POST',
-        
+        headers: { 
+            "Content-Type": "application/json" // Обязательно верни это!
+        },
         body: JSON.stringify({ login, password })
     }).then((res) => {
         if (res.status === 400) throw new Error("Неверный логин или пароль");
+        if (!res.ok) throw new Error("Ошибка сервера");
         return res.json();
-    }).then((data) => {
-        setToken(data.user.token);
-        setUserName(data.user.name);
-        return data;
     });
 };
 
 export const registration = (name, login, password) => {
     return fetch(authHost, {
         method: 'POST',
-        
-        body: JSON.stringify({
-            login: login,
-            name: name,      
-            password: password 
-        })
+        headers: { 
+            "Content-Type": "application/json" // И здесь тоже
+        },
+        body: JSON.stringify({ login, name, password })
     }).then((res) => {
-        if (res.status === 400) {
-            throw new Error("Пользователь уже существует или данные слишком короткие");
-        }
-        if (!res.ok) {
-            throw new Error("Ошибка сервера");
-        }
+        if (res.status === 400) throw new Error("Пользователь уже существует");
+        if (!res.ok) throw new Error("Ошибка сервера");
         return res.json();
-    }).then((data) => {
-        setToken(data.user.token);
-        setUserName(data.user.name);
-        return data;
     });
 };
+
