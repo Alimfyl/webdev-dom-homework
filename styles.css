@@ -135,3 +135,33 @@ body {
   .add-form-button:hover {
     opacity: 0.9;
   }
+  
+.add-form input {
+    margin-bottom: 12px; 
+    width: 100%;
+    box-sizing: border-box;
+}
+
+
+.link-button {
+    display: block;
+    margin: 15px auto 0;
+    background: none;
+    border: none;
+    color: #ffffff;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+.link-button:hover {
+    opacity: 1;
+}
+
+
+.add-form h1 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    text-align: center;
+}
