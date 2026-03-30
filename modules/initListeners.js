@@ -1,3 +1,4 @@
+import { comments } from "./comments.js";
 import { token } from "./api.js"; 
 
 export const initLikeListeners = (render) => {
