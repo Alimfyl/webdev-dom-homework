@@ -1,7 +1,7 @@
 import { fetchComments, postComment } from "./modules/api.js";
 import { setComments } from "./modules/comments.js";
 import { renderComments } from "./modules/renderComments.js";
-
+import {initReplyListeners} from"./modules/initListeners.js"
 
 export const getAndRenderComments = () => {
     return fetchComments()
@@ -17,6 +17,7 @@ export const getAndRenderComments = () => {
             setComments(appComments);
             renderComments(); 
             subscribeToAddEvents();
+            initReplyListeners();
         })
         .catch((error) => {
             console.error(error);
