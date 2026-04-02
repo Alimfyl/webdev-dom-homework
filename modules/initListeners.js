@@ -1,10 +1,18 @@
 import { comments } from "./comments.js";
+import { token } from "./api.js"; 
 
 export const initLikeListeners = (render) => {
     const likeButtons = document.querySelectorAll(".like-button");
     for (const likeButton of likeButtons) {
         likeButton.addEventListener("click", (event) => {
             event.stopPropagation();
+            
+            
+            if (!token) {
+                alert("Чтобы ставить лайки, авторизуйтесь");
+                return;
+            }
+
             const index = likeButton.dataset.index;
             const comment = comments[index];
 
@@ -19,6 +27,8 @@ export const initLikeListeners = (render) => {
 export const initReplyListeners = () => {
     const commentElements = document.querySelectorAll(".comment");
     const commentInput = document.querySelector(".add-form-text");
+    
+    
     if (!commentInput) return;
 
     for (const commentElement of commentElements) {
@@ -26,18 +36,9 @@ export const initReplyListeners = () => {
             const index = commentElement.dataset.index;
             const comment = comments[index];
             
-            commentInput.value = `> ${comment.text}\n\n${comment.name}, `;
             
-            commentInput.scrollIntoView({ behavior: 'smooth' });
+            commentInput.value = `> ${comment.text}\n\n${comment.name}, `;
             commentInput.focus();
-        });
-    }
-};
-export const initValidationListeners = () => {
-    const inputs = document.querySelectorAll(".add-form-name, .add-form-text");
-    for (const input of inputs) {
-        input.addEventListener("input", () => {
-            input.classList.remove("error"); 
         });
     }
 };

@@ -1,27 +1,9 @@
 import { fetchComments, postComment } from "./modules/api.js";
 import { setComments } from "./modules/comments.js";
 import { renderComments } from "./modules/renderComments.js";
+import {initReplyListeners} from"./modules/initListeners.js"
 
-const addButton = document.querySelector(".add-form-button");
-const nameInput = document.querySelector(".add-form-name");
-const commentInput = document.querySelector(".add-form-text");
-const listLoader = document.getElementById("load-label"); 
-const addForm = document.querySelector(".add-form");       
-const addLoader = document.getElementById("add-loader");   
-
-const handleError = (error) => {
-    if (error.message === "Failed to fetch") {
-        alert("Кажется, у вас сломался интернет, попробуйте позже");
-    } else if (error.message === "Сервер сломался") {
-        alert("Сервер сломался, попробуй позже");
-    } else if (error.message === "Имя и комментарий должны быть не короче 3 символов") {
-        alert(error.message);
-    } else {
-        alert("Произошла неизвестная ошибка, попробуйте позже");
-    }
-};
-
-const getAndRenderComments = () => {
+export const getAndRenderComments = () => {
     return fetchComments()
         .then((data) => {
             const appComments = data.comments.map((comment) => ({
@@ -29,45 +11,59 @@ const getAndRenderComments = () => {
                 date: new Date(comment.date).toLocaleString().slice(0, -3),
                 text: comment.text,
                 likes: comment.likes,
-                isLiked: false,
+                isLiked: comment.isLiked,
             }));
 
             setComments(appComments);
-            renderComments();
-            if (listLoader) listLoader.style.display = "none";
+            renderComments(); 
+            subscribeToAddEvents();
+            initReplyListeners();
         })
         .catch((error) => {
-            handleError(error);
+            console.error(error);
+            if (error.message === "Failed to fetch") {
+                alert("Интернет упал");
+            } else {
+                alert(error.message);
+            }
         });
 };
 
+const subscribeToAddEvents = () => {
+    const addButton = document.querySelector(".add-form-button");
+    const commentInput = document.querySelector(".add-form-text");
+
+    if (!addButton) return;
+
+    addButton.addEventListener("click", () => {
+        const trimmedText = commentInput.value.trim();
+
+        if (trimmedText.length < 3) {
+            alert("Комментарий должен быть не короче 3 символов");
+            return;
+        }
+        
+        const addForm = document.querySelector(".add-form");
+        const addLoader = document.getElementById("add-loader");
+
+        addForm.style.display = "none";
+        addLoader.style.display = "block";
+
+        postComment(trimmedText)
+            .then(() => {
+                return getAndRenderComments();
+            })
+            .then(() => {
+                
+                if (commentInput) commentInput.value = "";
+            })
+            .catch((error) => {
+                addForm.style.display = "flex";
+                addLoader.style.display = "none";
+                alert(error.message);
+            });
+    });
+};
+
+
 getAndRenderComments();
-
-addButton.addEventListener("click", () => {
-    const trimmedName = nameInput.value.trim();
-    const trimmedText = commentInput.value.trim();
-
-    if (trimmedName.length < 3 || trimmedText.length < 3) {
-        alert("Имя и комментарий должны быть не короче 3 символов");
-        return;
-    }
-
-    addForm.style.display = "none";
-    addLoader.style.display = "block";
-
-    postComment(trimmedText, trimmedName)
-        .then(() => {
-            return getAndRenderComments();
-        })
-        .then(() => {
-            addForm.style.display = "flex";
-            addLoader.style.display = "none";
-            nameInput.value = "";
-            commentInput.value = "";
-        })
-        .catch((error) => {
-            addForm.style.display = "flex";
-            addLoader.style.display = "none";
-            handleError(error);
-        });
-});
